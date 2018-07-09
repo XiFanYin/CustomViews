@@ -1,17 +1,22 @@
 package MyViews
 
-import android.animation.*
+import android.animation.Animator
+import android.animation.AnimatorListenerAdapter
+import android.animation.AnimatorSet
+import android.animation.ObjectAnimator
 import android.content.Context
 import android.graphics.*
 import android.util.AttributeSet
-import android.util.Log
 import android.view.View
+import android.view.animation.LinearInterpolator
+
 
 /**
- * Created by Administrator on 2018/7/6.
+ * Created by Administrator on 2018/7/9.
  */
 class AnimationButton : View, View.OnClickListener {
-
+    //动画集合
+    val animatorset: AnimatorSet
     //背景颜色
     val bg_color = "#88880000"
     //控件的默认宽
@@ -28,13 +33,37 @@ class AnimationButton : View, View.OnClickListener {
     val bg_Paint: Paint
     //矩形长度默认变化
     var change: Float = 0F
-    //背景默认角度
+        set(value) {
+            field = value
+            invalidate()
+        }
+    //背景默认角度,重写set方法，去自定义属性动画
     var default_Round = 0.0F
+        set(value) {
+            field = value
+            invalidate()
+        }
     //是否画上对钩
     var check: Boolean = false
     //对号画笔
     val checkPaint: Paint
+    //对号的路径
+    var checkPath: Path
+    //对号的虚线绘制数组
+    var intervals: FloatArray
+    //路径变化的百分比
+    var percent = 0F
+        set(value) {
+            //打开绘制的开关
+            check = true
+            field = value
+            checkPaint.setPathEffect(getDashPathEffect())//设置画笔的偏移量
+            //重新绘制
+            invalidate()
+        }
 
+    //绘制线的变换
+    fun getDashPathEffect(): PathEffect = DashPathEffect(intervals, intervals.get(0) - percent * intervals.get(0))
 
     //构造方法
     constructor(context: Context?) : this(context, null)
@@ -64,11 +93,44 @@ class AnimationButton : View, View.OnClickListener {
         //创建对号画笔
         checkPaint = Paint(Paint.ANTI_ALIAS_FLAG)
         checkPaint.color = Color.WHITE
-        checkPaint.setStyle(Paint.Style.STROKE)//设置画线模式
+        checkPaint.setStyle(Paint.Style.STROKE)//设checkPath置画线模式
         checkPaint.setStrokeWidth(8F) // 线条宽度为 20 像素
+        //绘制对号的路径
+        checkPath = Path()
+        //计算对号关键点绝对坐标
+        val startX = (bg_width - bg_height) / 2 + bg_height / 4
+        val startY = bg_height / 3
+        val guaiX = bg_width / 2
+        val guaiY = bg_height * 2 / 3
+        val endX = (bg_width - bg_height) / 2 + 5 * bg_height / 6
+        val endY = bg_height / 4
+        checkPath.moveTo(startX, startY)
+        checkPath.lineTo(guaiX, guaiY)
+        checkPath.lineTo(endX, endY)
+        //计算出路径的长度
+        val measure = PathMeasure(checkPath, false)
+        intervals = floatArrayOf(measure.length, measure.length)
+        //动画集合
+        animatorset = AnimatorSet()
 
         //设置点击事件
         setOnClickListener(this)
+        //设置动画完成监听,
+        animatorset.addListener(object : AnimatorListenerAdapter() {
+            override fun onAnimationEnd(animation: Animator) {
+                // 调用完这个之后最后会再去调用一次绘制方法，我们可以在这里边去恢复之前的动画
+                postDelayed({
+                    check = false
+                    default_Round = 0F
+                    percent = 0F
+                    change = 0F
+                    text_Paint.alpha = 255
+                    invalidate()
+                }, 500)
+
+            }
+        })
+
     }
 
 
@@ -84,9 +146,7 @@ class AnimationButton : View, View.OnClickListener {
         if (check) {
             drawCheck(canvas)
         }
-
     }
-
 
     //绘制背景
     fun drawRectBg(canvas: Canvas) {
@@ -105,34 +165,24 @@ class AnimationButton : View, View.OnClickListener {
 
     //绘制对号
     fun drawCheck(canvas: Canvas) {
-
+        canvas.drawPath(checkPath, checkPaint)
     }
 
-    //==============================以下是触摸之后的属性动画==========================
-
+    //触摸之后的属性动画
     override fun onClick(v: View) {
-        //动画集合
-        val animatorset = AnimatorSet()
         //直角矩形变成圆角巨型的动画
-        val Round = ValueAnimator.ofFloat(90F)
-        Round.addUpdateListener {
-            default_Round = it.getAnimatedValue() as Float
-            invalidate()
-        }
+        val Round = ObjectAnimator.ofFloat(this, "default_Round", 0F, 90F)
         //文字的透明度的变化动画
         val text_Alpha = ObjectAnimator.ofInt(text_Paint, "alpha", 255, 0)
-        //巨型变成圆动画
-        val kuan = ValueAnimator.ofFloat(0F, (bg_width - bg_height) / 2)
-        kuan.addUpdateListener {
-            change = it.getAnimatedValue() as Float
-            invalidate()
-        }
+        //距型变成圆动画
+        val kuan = ObjectAnimator.ofFloat(this, "change", 0F, (bg_width - bg_height) / 2)
+        //偏移量控制线的绘制过程
+        val duihao = ObjectAnimator.ofFloat(this, "percent", 0.0F, 1.0F)
         //添加到集合，然后开始动画
-        animatorset.play(Round).with(text_Alpha).with(kuan)
-        animatorset.duration = 1200
+        animatorset.play(Round).with(text_Alpha).with(kuan).before(duihao)
+        animatorset.duration = 800
+        animatorset.interpolator = LinearInterpolator()
         animatorset.start()
-
     }
-
 
 }
