@@ -13,6 +13,10 @@ import android.view.animation.LinearInterpolator
 
 /**
  * Created by Administrator on 2018/7/9.
+ * 主要练习：
+ * 1.绘制文字的开始位置计算
+ * 2.绘制动画曲线的方法
+ *
  */
 class AnimationButton : View, View.OnClickListener {
     //动画集合
@@ -120,12 +124,7 @@ class AnimationButton : View, View.OnClickListener {
             override fun onAnimationEnd(animation: Animator) {
                 // 调用完这个之后最后会再去调用一次绘制方法，我们可以在这里边去恢复之前的动画
                 postDelayed({
-                    check = false
-                    default_Round = 0F
-                    percent = 0F
-                    change = 0F
-                    text_Paint.alpha = 255
-                    invalidate()
+                    reset()
                 }, 500)
 
             }
@@ -183,6 +182,18 @@ class AnimationButton : View, View.OnClickListener {
         animatorset.duration = 800
         animatorset.interpolator = LinearInterpolator()
         animatorset.start()
+    }
+
+    /**
+     * 动画还原
+     */
+    fun reset() {
+        check = false
+        default_Round = 0F
+        percent = 0F
+        change = 0F
+        text_Paint.alpha = 255
+        invalidate()
     }
 
 }
