@@ -12,6 +12,7 @@ import android.view.View
 
 /**
  * Created by Administrator on 2018/7/10.
+ * 自定义圆形进度条
  */
 class CircleProgress : View {
     //控件默认的宽
