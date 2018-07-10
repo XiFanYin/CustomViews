@@ -20,17 +20,17 @@ import android.view.animation.LinearInterpolator
  */
 class AnimationButton : View, View.OnClickListener {
     //动画集合
-    val animatorset: AnimatorSet
+    val animatorset: AnimatorSet = AnimatorSet()
     //背景颜色
     val bg_color = "#88880000"
     //控件的默认宽
-    val bg_width = DisplayUtils.dip2px(context, 140F)
+    var bg_width = DisplayUtils.dip2px(context, 140F)
     //控件的默认高
-    val bg_height = DisplayUtils.dip2px(context, 50F)
+    var bg_height = DisplayUtils.dip2px(context, 50F)
     //文字画笔
     val text_Paint: Paint
     //文字默认的大小
-    val text_size = DisplayUtils.dip2px(context, 20F)
+    var text_size = DisplayUtils.dip2px(context, 20F)
     //默认文字内容
     val text_content = "确认完成"
     //画背景矩形的画笔
@@ -52,9 +52,9 @@ class AnimationButton : View, View.OnClickListener {
     //对号画笔
     val checkPaint: Paint
     //对号的路径
-    var checkPath: Path
+    lateinit var checkPath: Path
     //对号的虚线绘制数组
-    var intervals: FloatArray
+    lateinit var intervals: FloatArray
     //路径变化的百分比
     var percent = 0F
         set(value) {
@@ -99,23 +99,6 @@ class AnimationButton : View, View.OnClickListener {
         checkPaint.color = Color.WHITE
         checkPaint.setStyle(Paint.Style.STROKE)//设checkPath置画线模式
         checkPaint.setStrokeWidth(8F) // 线条宽度为 20 像素
-        //绘制对号的路径
-        checkPath = Path()
-        //计算对号关键点绝对坐标
-        val startX = (bg_width - bg_height) / 2 + bg_height / 4
-        val startY = bg_height / 3
-        val guaiX = bg_width / 2
-        val guaiY = bg_height * 2 / 3
-        val endX = (bg_width - bg_height) / 2 + 5 * bg_height / 6
-        val endY = bg_height / 4
-        checkPath.moveTo(startX, startY)
-        checkPath.lineTo(guaiX, guaiY)
-        checkPath.lineTo(endX, endY)
-        //计算出路径的长度
-        val measure = PathMeasure(checkPath, false)
-        intervals = floatArrayOf(measure.length, measure.length)
-        //动画集合
-        animatorset = AnimatorSet()
 
         //设置点击事件
         setOnClickListener(this)
@@ -132,10 +115,34 @@ class AnimationButton : View, View.OnClickListener {
 
     }
 
-
     //告诉父布局，我需要的尺寸
     override fun onMeasure(widthMeasureSpec: Int, heightMeasureSpec: Int) {
         setMeasuredDimension(resolveSize(bg_width.toInt(), widthMeasureSpec), resolveSize(bg_height.toInt(), heightMeasureSpec))
+    }
+
+    override fun onSizeChanged(w: Int, h: Int, oldw: Int, oldh: Int) {
+        //改变文字画笔的大小
+        text_size = text_size * w / bg_width
+        text_Paint.textSize = text_size
+        //容错处理，防止开发者给的大小不满足控件需要的大小，这里就需要缩放
+        bg_width = w.toFloat()
+        bg_height = h.toFloat()
+        //绘制对号的路径
+        checkPath = Path()
+        //计算对号关键点绝对坐标
+        val startX = (bg_width - bg_height) / 2 + bg_height / 4
+        val startY = bg_height / 3
+        val guaiX = bg_width / 2
+        val guaiY = bg_height * 2 / 3
+        val endX = (bg_width - bg_height) / 2 + 5 * bg_height / 6
+        val endY = bg_height / 4
+        checkPath.moveTo(startX, startY)
+        checkPath.lineTo(guaiX, guaiY)
+        checkPath.lineTo(endX, endY)
+        //计算出路径的长度
+        val measure = PathMeasure(checkPath, false)
+        intervals = floatArrayOf(measure.length, measure.length)
+
     }
 
     //开始绘制
