@@ -5,6 +5,7 @@ import android.support.v7.app.AppCompatActivity
 import android.os.Bundle
 import kotlinx.android.synthetic.main.activity_main.*
 import view.local.zz.customviews.activity.AnimationButtonActivity
+import view.local.zz.customviews.activity.CircleProgressActivity
 
 class MainActivity : AppCompatActivity() {
 
@@ -14,5 +15,6 @@ class MainActivity : AppCompatActivity() {
 
         animationBtn.setOnClickListener { startActivity(Intent(this, AnimationButtonActivity::class.java)) }
 
+        circle_progress.setOnClickListener { startActivity(Intent(this, CircleProgressActivity::class.java)) }
     }
 }

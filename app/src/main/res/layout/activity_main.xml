@@ -17,6 +17,14 @@
             android:layout_height="wrap_content"
             android:text="自定义动画按钮" />
 
+        <Button
+            android:id="@+id/circle_progress"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="自定义圆形进度条" />
+
+
+
 
     </LinearLayout>
 

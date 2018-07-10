@@ -124,7 +124,7 @@ class AnimationButton : View, View.OnClickListener {
         //改变文字画笔的大小
         text_size = text_size * w / bg_width
         text_Paint.textSize = text_size
-        //容错处理，防止开发者给的大小不满足控件需要的大小，这里就需要缩放
+        //改变控件的默认宽高，然后基于改变后的宽高去计算所有的坐标，然后去绘制
         bg_width = w.toFloat()
         bg_height = h.toFloat()
         //绘制对号的路径
