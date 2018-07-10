@@ -15,6 +15,11 @@ AnimationButton
 
 ![效果图](https://user-gold-cdn.xitu.io/2018/7/9/1647e81d16e4bae2?imageslim)
 
+CircleProgress
+-------------
+文章地址：[自我绘制二](https://juejin.im/post/5b446378e51d45195b335578)
+
+![效果图](https://user-gold-cdn.xitu.io/2018/7/10/1648324fbbd8f353?imageslim)
 
 
 
