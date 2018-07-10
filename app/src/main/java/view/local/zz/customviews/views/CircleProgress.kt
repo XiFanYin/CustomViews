@@ -9,7 +9,6 @@ import android.os.Build
 import android.support.annotation.RequiresApi
 import android.util.AttributeSet
 import android.view.View
-import java.util.*
 
 /**
  * Created by Administrator on 2018/7/10.
@@ -120,7 +119,7 @@ class CircleProgress : View {
             vScale = heightSize.toFloat() / defult_Height
         }
         //取较小的缩放比例
-        val scale = Math.min(hScale, vScale)
+        var scale = Math.min(hScale, vScale)
         //设置进去正确的数字
         setMeasuredDimension(resolveSize((defult_Widht * scale).toInt(), widthMeasureSpec), resolveSize((defult_Height * scale).toInt(), heightMeasureSpec))
     }
@@ -131,7 +130,7 @@ class CircleProgress : View {
         //计算控件真实显示的宽高
         val realWidht = right - left
         val realHeight = bottom - top
-
+        //默认缩放比例
         var scal = 1.0F
         //说明需要缩放，计算缩放绘制
         if (realWidht < defult_Widht || realHeight < defult_Height) {
@@ -184,6 +183,7 @@ class CircleProgress : View {
     @RequiresApi(Build.VERSION_CODES.LOLLIPOP)
     private fun drawProgressCircle(canvas: Canvas) {
         val d = progress * 360 / 100
+        //边界要考虑线的宽度的一半计算进去
         canvas.drawArc(0F + defult_bg_StrokeWidth / 2,
                 0F + defult_bg_StrokeWidth / 2,
                 defult_Widht - defult_bg_StrokeWidth / 2,
