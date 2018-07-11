@@ -21,7 +21,8 @@ AnimationButton讲解文章：[自我绘制二](https://juejin.im/post/5b446378e
 
 ![效果图](https://user-gold-cdn.xitu.io/2018/7/10/1648324fbbd8f353?imageslim)
 
+HorizontalProgress
+------------
+HorizontalProgress讲解文章：[自我绘制三](https://juejin.im/post/5b455b736fb9a04fad3a0073)
 
-
-
-
+![效果图](https://user-gold-cdn.xitu.io/2018/7/11/164881b37140c40f?imageslim)
