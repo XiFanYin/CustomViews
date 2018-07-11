@@ -14,7 +14,7 @@ import android.view.View
 
 /**
  * Created by Administrator on 2018/7/10.
- * 自定义水平进度条
+ * 自定义水平进度条，主要学习padding设置的用法
  */
 class HorizontalProgress : View {
 
