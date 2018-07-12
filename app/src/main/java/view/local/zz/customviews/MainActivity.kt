@@ -5,6 +5,7 @@ import android.os.Bundle
 import android.support.v7.app.AppCompatActivity
 import kotlinx.android.synthetic.main.activity_main.*
 import view.local.zz.customviews.activity.AnimationButtonActivity
+import view.local.zz.customviews.activity.BezuerLineActivity
 import view.local.zz.customviews.activity.CircleProgressActivity
 import view.local.zz.customviews.activity.HorizontalProgressActivity
 
@@ -21,7 +22,9 @@ class MainActivity : AppCompatActivity() {
 
         horizontal_progress.setOnClickListener { startActivity(Intent(this, HorizontalProgressActivity::class.java)) }
 
-        bez.start()
+        bezbtn.setOnClickListener { startActivity(Intent(this, BezuerLineActivity::class.java)) }
+
+
     }
 
 

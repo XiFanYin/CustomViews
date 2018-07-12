@@ -9,6 +9,7 @@ import android.graphics.Paint
 import android.graphics.Path
 import android.util.AttributeSet
 import android.view.View
+import android.view.animation.LinearInterpolator
 
 /**
  * Created by Administrator on 2018/7/11.
@@ -18,7 +19,9 @@ class BezierLine : View {
     //控件默认的宽 = 屏幕的宽度
     private var defult_Widht = DisplayUtils.getDisplayWidth(context).toFloat()
     //控件默认的高
-    private var defult_Height = DisplayUtils.dip2px(context, 150F)
+    private var defult_Height = DisplayUtils.dip2px(context, 100F)
+
+    private  val gaodu = DisplayUtils.dip2px(context, 30F)
 
 
     //画线波浪的画笔
@@ -72,34 +75,34 @@ class BezierLine : View {
     }
 
     private fun drawBez(canvas: Canvas) {
-
-        //起始点
-        var startX1 = -defult_Widht
+        mWavePath.reset()
+        //起始点,这里是屏幕和屏幕的坐为坐标原点
+        var startX1 = -defult_Widht + movelenght
         var startY1 = defult_Height / 2
         //控制点
-        var controlX1 = -defult_Widht * 3 / 4
-        var controlY1 = 0F
+        var controlX1 = -defult_Widht * 3 / 4 + movelenght
+        var controlY1 = 0F+gaodu
         //结束点,也是第二个曲线的起点
-        var endX1 = -defult_Widht / 2
+        var endX1 = -defult_Widht / 2 + movelenght
         var endY1 = defult_Height / 2
         //控制点2
-        var controlX2 = -defult_Widht / 4
-        var controlY2 = defult_Height
+        var controlX2 = -defult_Widht / 4 + movelenght
+        var controlY2 = defult_Height-gaodu
         //结束点2也是第三个曲线的起点
-        var endX2 = 0F
+        var endX2 = 0F + movelenght
         var endY2 = defult_Height / 2
 
 //        //控制点
-        var controlX3 = defult_Widht / 4
-        var controlY3 = 0F
+        var controlX3 = defult_Widht / 4 + movelenght
+        var controlY3 = 0F+gaodu
         //结束点,也是第二个曲线的起点
-        var endX4 = defult_Widht / 2
+        var endX4 = defult_Widht / 2 + movelenght
         var endY4 = defult_Height / 2
         //控制点2
-        var controlX5 = defult_Widht * 3 / 4
-        var controlY5 = defult_Height
+        var controlX5 = defult_Widht * 3 / 4 + movelenght
+        var controlY5 = defult_Height-gaodu
         //结束点2
-        var endX6 = defult_Widht
+        var endX6 = defult_Widht + movelenght
         var endY6 = defult_Height / 2
 
 
@@ -111,14 +114,16 @@ class BezierLine : View {
         mWavePath.quadTo(controlX5, controlY5, endX6, endY6)
 
         mWavePath.lineTo(width.toFloat(), height.toFloat())
-        mWavePath.lineTo(-width.toFloat(), defult_Height)
+        mWavePath.lineTo(-width.toFloat(), height.toFloat())
         canvas.drawPath(mWavePath, wave_Paint)
     }
 
 
     fun start() {
         val animator = ObjectAnimator.ofFloat(this, "movelenght", 0F, defult_Widht)
-        animator.duration = 10000
+        animator.duration = 2000
+        animator.repeatCount = -1
+        animator.interpolator = LinearInterpolator()
         animator.start()
     }
 

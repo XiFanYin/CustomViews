@@ -20,6 +20,7 @@
         <activity android:name=".activity.AnimationButtonActivity" />
         <activity android:name=".activity.CircleProgressActivity" />
         <activity android:name=".activity.HorizontalProgressActivity" />
+        <activity android:name=".activity.BezuerLineActivity" />
     </application>
 
 </manifest>
