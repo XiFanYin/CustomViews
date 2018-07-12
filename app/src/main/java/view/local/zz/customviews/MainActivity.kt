@@ -21,7 +21,7 @@ class MainActivity : AppCompatActivity() {
 
         horizontal_progress.setOnClickListener { startActivity(Intent(this, HorizontalProgressActivity::class.java)) }
 
-
+        bez.start()
     }
 
 

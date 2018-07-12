@@ -29,6 +29,13 @@
             android:layout_height="wrap_content"
             android:text="自定义圆形进度条" />
 
+
+        <MyViews.BezierLine
+            android:id="@+id/bez"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content" />
+
+
     </LinearLayout>
 
 
