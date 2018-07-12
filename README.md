@@ -26,3 +26,9 @@ HorizontalProgress
 HorizontalProgress讲解文章：[自我绘制三](https://juejin.im/post/5b455b736fb9a04fad3a0073)
 
 ![效果图](https://user-gold-cdn.xitu.io/2018/7/11/164881b37140c40f?imageslim)
+
+BezierLine
+------------
+BezierLine讲解文章：[自我绘制四](https://juejin.im/post/5b45b80cf265da0f894b5588)
+
+![效果图](https://user-gold-cdn.xitu.io/2018/7/12/1648d887f158f59a?imageslim)
