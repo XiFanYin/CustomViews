@@ -21,7 +21,7 @@ class BezierLine : View {
     //控件默认的高
     private var defult_Height = DisplayUtils.dip2px(context, 100F)
 
-    private  val gaodu = DisplayUtils.dip2px(context, 30F)
+    private val gaodu = DisplayUtils.dip2px(context, 30F)
 
 
     //画线波浪的画笔
@@ -81,26 +81,26 @@ class BezierLine : View {
         var startY1 = defult_Height / 2
         //控制点
         var controlX1 = -defult_Widht * 3 / 4 + movelenght
-        var controlY1 = 0F+gaodu
+        var controlY1 = 0F + gaodu
         //结束点,也是第二个曲线的起点
         var endX1 = -defult_Widht / 2 + movelenght
         var endY1 = defult_Height / 2
         //控制点2
         var controlX2 = -defult_Widht / 4 + movelenght
-        var controlY2 = defult_Height-gaodu
+        var controlY2 = defult_Height - gaodu
         //结束点2也是第三个曲线的起点
         var endX2 = 0F + movelenght
         var endY2 = defult_Height / 2
 
 //        //控制点
         var controlX3 = defult_Widht / 4 + movelenght
-        var controlY3 = 0F+gaodu
+        var controlY3 = 0F + gaodu
         //结束点,也是第二个曲线的起点
         var endX4 = defult_Widht / 2 + movelenght
         var endY4 = defult_Height / 2
         //控制点2
         var controlX5 = defult_Widht * 3 / 4 + movelenght
-        var controlY5 = defult_Height-gaodu
+        var controlY5 = defult_Height - gaodu
         //结束点2
         var endX6 = defult_Widht + movelenght
         var endY6 = defult_Height / 2
@@ -120,6 +120,7 @@ class BezierLine : View {
 
 
     fun start() {
+        //防止内存泄漏，记得停止动画，不是本文的重点，不再提供方法
         val animator = ObjectAnimator.ofFloat(this, "movelenght", 0F, defult_Widht)
         animator.duration = 2000
         animator.repeatCount = -1
