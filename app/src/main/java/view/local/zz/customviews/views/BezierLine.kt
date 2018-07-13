@@ -12,6 +12,7 @@ import android.view.View
 import android.view.animation.LinearInterpolator
 
 /**
+ *
  * Created by Administrator on 2018/7/11.
  *贝塞尔曲线
  */

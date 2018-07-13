@@ -24,6 +24,7 @@ class MainActivity : AppCompatActivity() {
 
         bezbtn.setOnClickListener { startActivity(Intent(this, BezuerLineActivity::class.java)) }
 
+        circleBezierProgress.start()
 
     }
 
