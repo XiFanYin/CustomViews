@@ -4,10 +4,7 @@ import android.content.Intent
 import android.os.Bundle
 import android.support.v7.app.AppCompatActivity
 import kotlinx.android.synthetic.main.activity_main.*
-import view.local.zz.customviews.activity.AnimationButtonActivity
-import view.local.zz.customviews.activity.BezuerLineActivity
-import view.local.zz.customviews.activity.CircleProgressActivity
-import view.local.zz.customviews.activity.HorizontalProgressActivity
+import view.local.zz.customviews.activity.*
 
 class MainActivity : AppCompatActivity() {
 
@@ -24,7 +21,8 @@ class MainActivity : AppCompatActivity() {
 
         bezbtn.setOnClickListener { startActivity(Intent(this, BezuerLineActivity::class.java)) }
 
-        circleBezierProgress.start()
+        circle_bezier.setOnClickListener { startActivity(Intent(this, CircleBezierProgressActivity::class.java)) }
+
 
     }
 

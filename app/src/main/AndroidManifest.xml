@@ -16,11 +16,11 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-
         <activity android:name=".activity.AnimationButtonActivity" />
         <activity android:name=".activity.CircleProgressActivity" />
         <activity android:name=".activity.HorizontalProgressActivity" />
         <activity android:name=".activity.BezuerLineActivity" />
+        <activity android:name=".activity.CircleBezierProgressActivity" />
     </application>
 
 </manifest>

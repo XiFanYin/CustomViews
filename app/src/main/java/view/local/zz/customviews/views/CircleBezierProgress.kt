@@ -38,14 +38,21 @@ class CircleBezierProgress : View {
     //画线波浪的画笔
     private lateinit var wave_Paint: Paint
     //平移的距离
-    var movelenght = 0F
+    private var movelenght = 0F
         set(value) {
             field = value
             invalidate()
         }
 
-    private var progress = DisplayUtils.dip2px(context, 75F)
-
+    private var progress = 0F
+        set(value) {
+            field = value
+            invalidate()
+        }
+    //默认文字的大小
+    private val textSize = DisplayUtils.sp2px(context, 38F)
+    //绘制中心文字的画笔
+    private lateinit var centerText_Paint: Paint
 
     constructor(context: Context?) : this(context, null)
     constructor(context: Context?, attrs: AttributeSet?) : this(context, attrs, 0)
@@ -59,7 +66,7 @@ class CircleBezierProgress : View {
     }
 
     //初始化画笔
-    fun initPaint() {
+    private fun initPaint() {
         //创建绘制弧形的画笔
         bg_Paint = Paint(Paint.ANTI_ALIAS_FLAG)
         //画笔的颜色
@@ -69,7 +76,6 @@ class CircleBezierProgress : View {
         //设置画线的宽度
         bg_Paint.strokeWidth = defult_bg_StrokeWidth
 
-
         //画线波浪的画笔
         wave_Paint = Paint(Paint.ANTI_ALIAS_FLAG)
         //设置画线模式
@@ -77,6 +83,16 @@ class CircleBezierProgress : View {
         //设置线的颜色
         wave_Paint.color = Color.parseColor("#FFAA00")
 
+        //创建绘制中心文字的画笔
+        centerText_Paint = Paint(Paint.ANTI_ALIAS_FLAG)
+        //设置绘制文字画笔颜色
+        centerText_Paint.color = Color.parseColor("#eeeeee")
+        //计算文字开始大小
+        centerText_Paint.textSize = textSize.toFloat()
+        //设置中心位置
+        centerText_Paint.textAlign = Paint.Align.CENTER
+        //设置文字加粗
+        centerText_Paint.isFakeBoldText = true
     }
 
 
@@ -90,7 +106,13 @@ class CircleBezierProgress : View {
         defult_Height = h.toFloat()
         //添加裁剪区域
         clipCirclePath.addCircle(defult_Widht / 2, defult_Height / 2, defult_Widht / 2, Path.Direction.CW)
-
+        //左右播放的动画
+        // 防止内存泄漏，记得停止动画，不是本文的重点，不再提供方法
+        val animator = ObjectAnimator.ofFloat(this, "movelenght", 0F, cycle * cycle_Count)
+        animator.duration = 4000
+        animator.repeatCount = -1
+        animator.interpolator = LinearInterpolator()
+        animator.start()
     }
 
     override fun onDraw(canvas: Canvas) {
@@ -113,6 +135,7 @@ class CircleBezierProgress : View {
         //绘制波形图
         drawBez(canvas)
 
+        drawText(canvas)
 
     }
 
@@ -131,26 +154,26 @@ class CircleBezierProgress : View {
     private fun drawBez(canvas: Canvas) {
         mWavePath.reset()
         //先画一个静态的
-        var startX = -cycle * cycle_Count+movelenght
+        var startX = -cycle * cycle_Count + movelenght
         var startY = defult_Height + waveHeight / 2 - progress
         mWavePath.moveTo(startX, startY)
 
         //计算屏幕外左边所有控制点
         for (i in cycle_Count downTo 1) {
             //波峰
-            var fengX = -cycle * (i) + cycle / 4+movelenght
+            var fengX = -cycle * (i) + cycle / 4 + movelenght
             var fengY = defult_Height - progress
             //中间点1
-            var endX = -cycle * (i) + cycle / 2+movelenght
+            var endX = -cycle * (i) + cycle / 2 + movelenght
             var endY = defult_Height + waveHeight / 2 - progress
             mWavePath.quadTo(fengX, fengY, endX, endY)
 
             //波谷的点
-            var guX = -cycle * (i) + cycle * 3 / 4+movelenght
+            var guX = -cycle * (i) + cycle * 3 / 4 + movelenght
             var guY = defult_Height + waveHeight - progress
 
             //中间点2
-            var endX2 = -cycle * (i - 1)+movelenght
+            var endX2 = -cycle * (i - 1) + movelenght
             var endY2 = defult_Height + waveHeight / 2 - progress
 
             mWavePath.quadTo(fengX, fengY, endX, endY)
@@ -160,19 +183,18 @@ class CircleBezierProgress : View {
 
         //计算屏幕右边所有控制点
         for (i in 1..cycle_Count) {
-
             //波峰
-            var fengX = cycle * (i) - cycle * 3 / 4+movelenght
+            var fengX = cycle * (i) - cycle * 3 / 4 + movelenght
             var fengY = defult_Height - progress
             //中间点1
-            var endX = cycle * (i) - cycle / 2+movelenght
+            var endX = cycle * (i) - cycle / 2 + movelenght
             var endY = defult_Height + waveHeight / 2 - progress
             //波谷的点
-            var guX = cycle * (i) - cycle * 1 / 4+movelenght
+            var guX = cycle * (i) - cycle * 1 / 4 + movelenght
             var guY = defult_Height + waveHeight - progress
 
             //中间点2
-            var endX2 = cycle * (i)+movelenght
+            var endX2 = cycle * (i) + movelenght
             var endY2 = defult_Height + waveHeight / 2 - progress
 
             mWavePath.quadTo(fengX, fengY, endX, endY)
@@ -187,13 +209,26 @@ class CircleBezierProgress : View {
 
     }
 
-    fun start() {
-        //防止内存泄漏，记得停止动画，不是本文的重点，不再提供方法
-        val animator = ObjectAnimator.ofFloat(this, "movelenght", 0F, cycle*cycle_Count)
-        animator.duration = 4000
-        animator.repeatCount = -1
-        animator.interpolator = LinearInterpolator()
-        animator.start()
+    //要想绘制文字
+    private fun drawText(canvas: Canvas) {
+        //要想绘制文字，就需要计算文字的开始位置
+        val startX = defult_Widht / 2
+        val fontMetrics = centerText_Paint.fontMetrics
+        val baseLine = defult_Height / 2 + (fontMetrics.bottom - fontMetrics.top) / 2 - fontMetrics.bottom
+        canvas.drawText("${(progress / (defult_Height + waveHeight) * 100).toInt()}%", startX, baseLine, centerText_Paint)
+    }
+
+
+    /**
+     * 设置进度，然后进行动画播放
+     */
+
+    fun setProgress(tagretProgress: Int, duration: Long = 5000) {
+
+        val animator2 = ObjectAnimator.ofFloat(this, "progress", 0F, (defult_Height + waveHeight) * tagretProgress / 100)
+        animator2.duration = duration
+        animator2.interpolator = LinearInterpolator()
+        animator2.start()
     }
 
 
