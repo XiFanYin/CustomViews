@@ -43,7 +43,7 @@ class CircleBezierProgress : View {
             field = value
             invalidate()
         }
-
+    //Y方法关键点移动的距离
     private var progress = 0F
         set(value) {
             field = value
@@ -153,11 +153,10 @@ class CircleBezierProgress : View {
     //绘制波形图，用贝塞尔曲线,
     private fun drawBez(canvas: Canvas) {
         mWavePath.reset()
-        //先画一个静态的
+        //开始点
         var startX = -cycle * cycle_Count + movelenght
         var startY = defult_Height + waveHeight / 2 - progress
         mWavePath.moveTo(startX, startY)
-
         //计算屏幕外左边所有控制点
         for (i in cycle_Count downTo 1) {
             //波峰

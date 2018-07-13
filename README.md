@@ -32,3 +32,9 @@ BezierLine
 BezierLine讲解文章：[自我绘制四](https://juejin.im/post/5b45b80cf265da0f894b5588)
 
 ![效果图](https://user-gold-cdn.xitu.io/2018/7/12/1648d887f158f59a?imageslim)
+
+CircleBezierProgress
+------------
+CircleBezierProgress讲解文章：[自我绘制五](https://juejin.im/post/5b4851b1e51d4519634fa95d)
+
+![效果图](https://user-gold-cdn.xitu.io/2018/7/13/1649283363b86013?imageslim)
