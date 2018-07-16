@@ -23,6 +23,8 @@ class MainActivity : AppCompatActivity() {
 
         circle_bezier.setOnClickListener { startActivity(Intent(this, CircleBezierProgressActivity::class.java)) }
 
+        bitmap_view.setOnClickListener { startActivity(Intent(this, BitmapViewActivity::class.java)) }
+
 
     }
 

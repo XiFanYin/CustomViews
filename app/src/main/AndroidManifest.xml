@@ -21,6 +21,7 @@
         <activity android:name=".activity.HorizontalProgressActivity" />
         <activity android:name=".activity.BezuerLineActivity" />
         <activity android:name=".activity.CircleBezierProgressActivity" />
+        <activity android:name=".activity.BitmapViewActivity" />
     </application>
 
 </manifest>

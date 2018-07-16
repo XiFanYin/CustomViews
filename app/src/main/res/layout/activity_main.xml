@@ -41,6 +41,11 @@
             android:layout_height="wrap_content"
             android:text="圆形贝塞尔进度条" />
 
+        <Button
+            android:id="@+id/bitmap_view"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="图片加载进度条" />
 
     </LinearLayout>
 

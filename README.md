@@ -57,3 +57,9 @@ CircleBezierProgress
 CircleBezierProgress讲解文章：[自我绘制五](https://juejin.im/post/5b4851b1e51d4519634fa95d)
 
 ![效果图](https://user-gold-cdn.xitu.io/2018/7/13/1649283363b86013?imageslim)
+
+BitmapView
+------------
+BitmapView讲解文章：[自我绘制六](https://juejin.im/post/5b486a4ce51d4518e3117551)
+
+![效果图](https://user-gold-cdn.xitu.io/2018/7/16/164a25583e7457e1?imageslim)
