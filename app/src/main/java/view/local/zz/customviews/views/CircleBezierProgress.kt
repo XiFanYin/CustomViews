@@ -104,7 +104,7 @@ class CircleBezierProgress : View {
         //矫正宽度和高度
         defult_Widht = w.toFloat()
         defult_Height = h.toFloat()
-        //添加裁剪区域
+        //添加裁剪区域，
         clipCirclePath.addCircle(defult_Widht / 2, defult_Height / 2, defult_Widht / 2, Path.Direction.CW)
         //左右播放的动画
         // 防止内存泄漏，记得停止动画，不是本文的重点，不再提供方法
@@ -125,10 +125,10 @@ class CircleBezierProgress : View {
         if (realWidht < defult_Widht || realHeight < defult_Height) {
             scal = Math.min(realWidht / defult_Widht, realHeight / defult_Height)
             canvas.save()
-            //缩放绘制
+            //这里使用的是几何变换
             canvas.scale(scal, scal)
         }
-        //裁剪
+        //这里使用的范围裁切的特性
         canvas.clipPath(clipCirclePath)
         //绘制背景圆形
         drawCircle(canvas)
