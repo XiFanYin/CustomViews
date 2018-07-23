@@ -25,6 +25,8 @@ class MainActivity : AppCompatActivity() {
 
         bitmap_view.setOnClickListener { startActivity(Intent(this, BitmapViewActivity::class.java)) }
 
+        view_group1.setOnClickListener { startActivity(Intent(this, MyViewGroup1Activity::class.java)) }
+
 
     }
 
