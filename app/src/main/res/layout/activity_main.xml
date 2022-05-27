@@ -46,11 +46,19 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:text="图片加载进度条" />
+
         <Button
             android:id="@+id/view_group1"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:text="自定义ViewGroup入门" />
+
+        <Button
+            android:id="@+id/image_surfaceView"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="opengl显示图片" />
+
     </LinearLayout>
 
 
