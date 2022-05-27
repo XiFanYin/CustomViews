@@ -8,7 +8,12 @@ import androidx.appcompat.app.AppCompatActivity;
 import view.local.zz.customviews.R;
 import view.local.zz.customviews.views.imagesurface.ImageSurfaceView;
 
-
+/**
+ * https://learnopengl-cn.github.io/
+ * https://wuwang.blog.csdn.net/article/details/52793354
+ * https://juejin.cn/post/6844903984235282445#heading-9
+ *
+ */
 public class ImageActivity extends AppCompatActivity {
 
     ImageSurfaceView imageSurface;

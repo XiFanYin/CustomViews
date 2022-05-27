@@ -23,7 +23,7 @@ public class ImageSurfaceView extends GLSurfaceView {
     public ImageSurfaceView(Context context, AttributeSet attrs) {
         super(context, attrs);
         if(t==null){
-            t = BitmapFactory.decodeResource(context.getResources(), R.drawable.fbb);
+            t = BitmapFactory.decodeResource(context.getResources(), R.drawable.fbb2);
         }
         //设置版本
         setEGLContextClientVersion(2);
