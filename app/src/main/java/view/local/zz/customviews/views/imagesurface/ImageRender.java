@@ -142,7 +142,7 @@ public class ImageRender implements GLSurfaceView.Renderer {
         //绘制矩形
         GLES20.glDrawArrays(GLES20.GL_TRIANGLE_STRIP, 0, 4);
         //绘制纹理
-        //激活指定纹理单元
+        //激活指定纹理单元,系统默认激活的是0
         GLES20.glActiveTexture(GLES20.GL_TEXTURE0);
         //将激活的纹理单元传递到着色器里面，这里的0和GLES20.GL_TEXTURE0一一对应
         GLES20.glUniform1i(mTextureHandler, 0);
