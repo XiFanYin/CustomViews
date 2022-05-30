@@ -29,6 +29,8 @@ class MainActivity : AppCompatActivity() {
         view_group1.setOnClickListener { startActivity(Intent(this, MyViewGroup1Activity::class.java)) }
 
         image_surfaceView.setOnClickListener { startActivity(Intent(this, OpenGLImageActivity::class.java)) }
+
+        camera_surfaceView.setOnClickListener { startActivity(Intent(this, OpenGLCameraActivity::class.java)) }
     }
 
 
