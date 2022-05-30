@@ -14,7 +14,7 @@ import view.local.zz.customviews.views.imagesurface.ImageSurfaceView;
  * https://juejin.cn/post/6844903984235282445#heading-9
  *
  */
-public class ImageActivity extends AppCompatActivity {
+public class OpenGLImageActivity extends AppCompatActivity {
 
     ImageSurfaceView imageSurface;
 
