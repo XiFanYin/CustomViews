@@ -81,7 +81,11 @@ public class VideoRender implements GLSurfaceView.Renderer {
 
     private MediaPlayerUtil mediaPlayerUtil;
 
-    private  VideoSurfaceView videoSurfaceView;
+    private VideoSurfaceView videoSurfaceView;
+
+    private GL10 gl;
+    private int width;
+    private int height;
 
     //构造方法
     public VideoRender(Context context, final VideoSurfaceView videoSurfaceView) {
@@ -99,22 +103,13 @@ public class VideoRender implements GLSurfaceView.Renderer {
         mTexBuffer.put(coord);
         mTexBuffer.position(0);
 
-
-        mediaPlayerUtil = new MediaPlayerUtil(context.getResources());
-        dataPoint = mediaPlayerUtil.getmPreSize();
-
+        mediaPlayerUtil = new MediaPlayerUtil(context.getResources(), this);
     }
 
-    @Override
-    public void onSurfaceCreated(GL10 gl, EGLConfig config) {
-        //清除颜色
-        GLES20.glClearColor(1.0f, 1.0f, 1.0f, 1.0f);
-        //创建一个纹理
-        texture = createTextureID();
-        //创建SurfaceTexture 传入纹理对象引用
-        surfaceTexture = new SurfaceTexture(texture);
-        //传递出去纹理对象
-        mediaPlayerUtil.setSurface(surfaceTexture);
+
+    public void setPoint(Point point) {
+        this.dataPoint = point;
+        onSurfaceChanged(gl, width, height);
         //此处调用渲染，会触发onDrawFrame执行
         surfaceTexture.setOnFrameAvailableListener(new SurfaceTexture.OnFrameAvailableListener() {
             @Override
@@ -122,6 +117,18 @@ public class VideoRender implements GLSurfaceView.Renderer {
                 videoSurfaceView.requestRender();
             }
         });
+    }
+
+    @Override
+    public void onSurfaceCreated(GL10 gl, EGLConfig config) {
+        //清除颜色
+        GLES20.glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
+        //创建一个纹理
+        texture = createTextureID();
+        //创建SurfaceTexture 传入纹理对象引用
+        surfaceTexture = new SurfaceTexture(texture);
+        //传递出去纹理对象
+        mediaPlayerUtil.setSurface(surfaceTexture);
         //加载程序
         int vertexShader = loadShader(GLES20.GL_VERTEX_SHADER, getVertexShader());
         //调用父类方法编译源码，传递类型为片段
@@ -149,28 +156,48 @@ public class VideoRender implements GLSurfaceView.Renderer {
         mHCoord = GLES20.glGetAttribLocation(mProgram, "aCoordinate");
         mHMatrix = GLES20.glGetUniformLocation(mProgram, "vMatrix");
         mHTexture = GLES20.glGetUniformLocation(mProgram, "vTexture");
-
-
     }
 
 
     @Override
     public void onSurfaceChanged(GL10 gl, int width, int height) {
+        this.gl = gl;
+        this.width = width;
+        this.height = height;
         //计算矩阵
         if (dataPoint != null && width > 0 && height > 0 && dataPoint.x > 0 && dataPoint.y > 0) {
             float sWhView = (float) width / height;
-            float sWhImg = (float) dataPoint.x / dataPoint.y;
+            float sWhVideo = (float) dataPoint.x / dataPoint.y;
             float[] projection = new float[16];
             float[] camera = new float[16];
-            if (sWhImg > sWhView) {
-                Matrix.orthoM(projection, 0, -sWhView / sWhImg, sWhView / sWhImg, -1, 1, 1, 3);
+//            1. 视口宽 > 高，并且视频的宽高比 > 视口的宽高比：缩放高度（Video_Ritio/GL_Ritio）
+//            2. 视口宽 > 高，并且视频的宽高比 < 视口的宽高比：缩放宽度（GL_Ritio/Video_Ritio）
+//            3. 视口宽 < 高，并且视频的宽高比 > 视口的宽高比：缩放高度（Video_Ritio/GL_Ritio）
+//            4. 视口宽 < 高，并且视频的宽高比 < 视口的宽高比：缩放宽度（GL_Ritio/Video_Ritio）
+            if (width > height) {
+                if (sWhVideo > sWhView) {
+                    Matrix.orthoM(projection, 0, -1, 1, -sWhVideo / sWhView, sWhVideo / sWhView, 1, 3);
+                } else {
+                    Matrix.orthoM(projection, 0, -sWhView / sWhVideo, sWhView / sWhVideo, -1, 1, 1, 3);
+                }
             } else {
-                Matrix.orthoM(projection, 0, -1, 1, -sWhImg / sWhView, sWhImg / sWhView, 1, 3);
+                if (sWhVideo > sWhView) {
+                    Matrix.orthoM(projection, 0, -1, 1, -sWhVideo / sWhView, sWhVideo / sWhView, 1, 3);
+                } else {
+                    Matrix.orthoM(projection, 0, -sWhView / sWhVideo, sWhView / sWhVideo, -1, 1, 1, 3);
+                }
             }
+
+
+//            if (sWhVideo > sWhView) {
+//                Matrix.orthoM(projection, 0, -sWhView / sWhVideo, sWhView / sWhVideo, -1, 1, 1, 3);
+//            } else {
+//                Matrix.orthoM(projection, 0, -1, 1, -sWhVideo / sWhView, sWhVideo / sWhView, 1, 3);
+//            }
+
             Matrix.setLookAtM(camera, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0);
             Matrix.multiplyMM(matrix, 0, projection, 0, camera, 0);
         }
-
     }
 
     @Override

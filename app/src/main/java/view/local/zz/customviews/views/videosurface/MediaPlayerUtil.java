@@ -16,12 +16,11 @@ public class MediaPlayerUtil {
 
     private MediaPlayer mediaPlayer;
     private Point mPreSize;
-
-    public MediaPlayerUtil(Resources resources) {
+    public MediaPlayerUtil(Resources resources, final VideoRender videoRender) {
         mediaPlayer = new MediaPlayer();
         mediaPlayer.setLooping(true);
         try {
-            AssetFileDescriptor test1 = resources.openRawResourceFd(R.raw.test2);
+            AssetFileDescriptor test1 = resources.openRawResourceFd(R.raw.test1);
             mediaPlayer.setDataSource(test1.getFileDescriptor(), test1.getStartOffset(), test1.getLength());
         } catch (IOException e) {
             e.printStackTrace();
@@ -29,12 +28,11 @@ public class MediaPlayerUtil {
         mediaPlayer.setOnPreparedListener(new MediaPlayer.OnPreparedListener() {
             @Override
             public void onPrepared(MediaPlayer mp) {
+                mPreSize = new Point(mp.getVideoWidth(), mp.getVideoHeight());
+                videoRender.setPoint(mPreSize);
                 mp.start();
             }
         });
-        //创建图片和预览的宽高
-        mPreSize = new Point(mediaPlayer.getVideoWidth(), mediaPlayer.getVideoHeight());
-        Log.e("rrrrrrrrrrrrrrrr", mPreSize.toString());
 
     }
 
@@ -44,8 +42,6 @@ public class MediaPlayerUtil {
         mediaPlayer.prepareAsync();
     }
 
-    public Point getmPreSize() {
-        return mPreSize;
-    }
+
 
 }
