@@ -27,6 +27,8 @@
         <activity android:name=".activity.MyViewGroup1Activity" />
         <activity android:name=".activity.OpenGLImageActivity" />
         <activity android:name=".activity.OpenGLCameraActivity" />
+        <activity android:name=".activity.OpenGLVideoActivity"/>
+
     </application>
 
 </manifest>

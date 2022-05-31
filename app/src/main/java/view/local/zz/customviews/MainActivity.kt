@@ -31,6 +31,8 @@ class MainActivity : AppCompatActivity() {
         image_surfaceView.setOnClickListener { startActivity(Intent(this, OpenGLImageActivity::class.java)) }
 
         camera_surfaceView.setOnClickListener { startActivity(Intent(this, OpenGLCameraActivity::class.java)) }
+
+        video_surfaceView.setOnClickListener { startActivity(Intent(this, OpenGLVideoActivity::class.java)) }
     }
 
 

@@ -66,6 +66,13 @@
             android:layout_height="wrap_content"
             android:text="opengl显示Camera" />
 
+        <Button
+            android:id="@+id/video_surfaceView"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="opengl显示Video" />
+
+
     </LinearLayout>
 
 
