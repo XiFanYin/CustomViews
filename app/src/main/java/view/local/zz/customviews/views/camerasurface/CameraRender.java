@@ -169,8 +169,10 @@ public class CameraRender implements GLSurfaceView.Renderer {
             float[] projection = new float[16];
             float[] camera = new float[16];
             if (sWhImg > sWhView) {
+                //宽度放不下，裁剪宽度
                 Matrix.orthoM(projection, 0, -sWhView / sWhImg, sWhView / sWhImg, -1, 1, 1, 3);
             } else {
+                //宽度能放下，以宽度为基准，高度上下留白
                 Matrix.orthoM(projection, 0, -1, 1, -sWhImg / sWhView, sWhImg / sWhView, 1, 3);
             }
             Matrix.setLookAtM(camera, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0);

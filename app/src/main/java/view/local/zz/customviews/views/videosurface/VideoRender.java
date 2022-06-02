@@ -174,16 +174,24 @@ public class VideoRender implements GLSurfaceView.Renderer {
 //            2. 视口宽 > 高，并且视频的宽高比 < 视口的宽高比：缩放宽度（GL_Ritio/Video_Ritio）
 //            3. 视口宽 < 高，并且视频的宽高比 > 视口的宽高比：缩放高度（Video_Ritio/GL_Ritio）
 //            4. 视口宽 < 高，并且视频的宽高比 < 视口的宽高比：缩放宽度（GL_Ritio/Video_Ritio）
+
+            //只要是宽度放不下，就裁剪高度，只要是宽度能放下，就以高度为基准，宽度左右留下空白
+            //横屏
             if (width > height) {
+                //宽度放不下，以宽度为基准放大，裁剪高度
                 if (sWhVideo > sWhView) {
                     Matrix.orthoM(projection, 0, -1, 1, -sWhVideo / sWhView, sWhVideo / sWhView, 1, 3);
                 } else {
+                    //宽度能放下，以高度为基准，剩余宽度左右空白
                     Matrix.orthoM(projection, 0, -sWhView / sWhVideo, sWhView / sWhVideo, -1, 1, 1, 3);
                 }
+                //竖屏
             } else {
+                //宽度放不下以宽度撑满，裁剪高度
                 if (sWhVideo > sWhView) {
                     Matrix.orthoM(projection, 0, -1, 1, -sWhVideo / sWhView, sWhVideo / sWhView, 1, 3);
                 } else {
+                    //宽度能放下，以高度为基准，剩余左右空白
                     Matrix.orthoM(projection, 0, -sWhView / sWhVideo, sWhView / sWhVideo, -1, 1, 1, 3);
                 }
             }

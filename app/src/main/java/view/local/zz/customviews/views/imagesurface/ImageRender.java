@@ -13,7 +13,10 @@ import java.nio.FloatBuffer;
 import javax.microedition.khronos.egl.EGLConfig;
 import javax.microedition.khronos.opengles.GL10;
 
-
+/**
+ * 当前渲染器未使用VBO（把顶点数据缓存到GPU开辟的一段内存中）进行提升效率，如果想要使用VBO参考：
+ * https://blog.csdn.net/york2017/article/details/111500865?spm=1001.2014.3001.5502
+ */
 public class ImageRender implements GLSurfaceView.Renderer {
 
     //创建纹理坐标
@@ -159,8 +162,6 @@ public class ImageRender implements GLSurfaceView.Renderer {
         //设置环绕方向T，截取纹理坐标到[1/2n,1-1/2n]。将导致永远不会与border融合
         GLES20.glTexParameterf(GLES20.GL_TEXTURE_2D, GLES20.GL_TEXTURE_WRAP_T, GLES20.GL_CLAMP_TO_EDGE);
         GLUtils.texImage2D(GLES20.GL_TEXTURE_2D, 0, mBitmap, 0);
-
-
 
     }
 
