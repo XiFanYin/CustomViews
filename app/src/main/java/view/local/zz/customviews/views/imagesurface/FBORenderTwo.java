@@ -202,8 +202,10 @@ public class FBORenderTwo implements GLSurfaceView.Renderer {
                 "uniform sampler2D uTexture;" +
                 "varying vec2 vCoordinate;" +
                 "void main() {" +
-                "  vec4 color = texture2D(uTexture, vCoordinate);" +
-                "  gl_FragColor = color;" +
+                "vec4 color = texture2D(uTexture, vCoordinate);" +
+                "float rgb=color.g;" +
+                "vec4 c=vec4(rgb,rgb,rgb,color.a);" +
+                "gl_FragColor = c;" +
                 "}";
     }
 
