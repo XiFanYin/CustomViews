@@ -14,10 +14,9 @@ import javax.microedition.khronos.egl.EGLConfig;
 import javax.microedition.khronos.opengles.GL10;
 
 /**
- * 当前渲染器未使用VBO（把顶点数据缓存到GPU开辟的一段内存中）进行提升效率，如果想要使用VBO参考：
- * https://blog.csdn.net/york2017/article/details/111500865?spm=1001.2014.3001.5502
+ * 提升效率，使用VBO
  */
-public class ImageRender implements GLSurfaceView.Renderer {
+public class VBOImageRender implements GLSurfaceView.Renderer {
 
     //创建纹理坐标
     float[] texture = {
@@ -36,8 +35,6 @@ public class ImageRender implements GLSurfaceView.Renderer {
     };
 
 
-
-
     private FloatBuffer vertexBuffer;
     private FloatBuffer textureBuffer;
     private int mProgram;
@@ -45,12 +42,14 @@ public class ImageRender implements GLSurfaceView.Renderer {
     private int mTexturePos;
     private int mTextureHandler;
     private int glHMatrix;
+    private int vboID;
+    private int textTureID;
     private Bitmap mBitmap;
 
     //变换矩阵
-    private float[] mViewMatrix=new float[16];
-    private float[] mProjectMatrix=new float[16];
-    private float[] mMVPMatrix=new float[16];
+    private float[] mViewMatrix = new float[16];
+    private float[] mProjectMatrix = new float[16];
+    private float[] mMVPMatrix = new float[16];
 
     //    https://blog.csdn.net/jeffdeen/article/details/55001797
     @Override
@@ -88,69 +87,25 @@ public class ImageRender implements GLSurfaceView.Renderer {
         //连接到着色器程序
         GLES20.glLinkProgram(mProgram);
 
-    }
+        //创建 VBO
+        int[] vbo = new int[1];
+        GLES20.glGenBuffers(1, vbo, 0);
+        vboID = vbo[0];
+        GLES20.glBindBuffer(GLES20.GL_ARRAY_BUFFER, vboID);
+        //分配 VBO需要的缓存大小
+        GLES20.glBufferData(GLES20.GL_ARRAY_BUFFER, vertexs.length * 4 + texture.length * 4, null, GLES20.GL_STATIC_DRAW);
+        //设置顶点坐标数据的值到 VBO
+        GLES20.glBufferSubData(GLES20.GL_ARRAY_BUFFER, 0, vertexs.length * 4, vertexBuffer);
+        //设置纹理坐标数据的值到 VBO
+        GLES20.glBufferSubData(GLES20.GL_ARRAY_BUFFER, vertexs.length * 4, texture.length * 4, textureBuffer);
+        //解绑 VBO，指的是离开对 VBO的配置，进入下一个状态
+        GLES20.glBindBuffer(GLES20.GL_ARRAY_BUFFER, 0);
 
-    @Override
-    public void onSurfaceChanged(GL10 gl, int width, int height) {
-        GLES20.glViewport(0, 0, width, height);
-        //处理图片变形问题,推导过程https://juejin.cn/post/6844903984235282445#heading-9
-        int w=mBitmap.getWidth();
-        int h=mBitmap.getHeight();
-        float sWH=w/(float)h;
-        float sWidthHeight=width/(float)height;
-        //视口宽度大于高度，横屏
-        if(width>height){
-            if(sWH>sWidthHeight){
-                Matrix.orthoM(mProjectMatrix, 0, -sWidthHeight*sWH,sWidthHeight*sWH, -1,1, 3, 5);
-            }else{
-                Matrix.orthoM(mProjectMatrix, 0, -sWidthHeight/sWH,sWidthHeight/sWH, -1,1, 3, 5);
-            }
-        }else{
-            if(sWH>sWidthHeight){
-                Matrix.orthoM(mProjectMatrix, 0, -1, 1, -1/sWidthHeight*sWH, 1/sWidthHeight*sWH,3, 5);
-            }else{
-                Matrix.orthoM(mProjectMatrix, 0, -1, 1, -sWH/sWidthHeight, sWH/sWidthHeight,3, 5);
-            }
-        }
-        //设置相机位置
-        Matrix.setLookAtM(mViewMatrix, 0, 0, 0, 5.0f, 0f, 0f, 0f, 0f, 1.0f, 0.0f);
-        //计算变换矩阵
-        Matrix.multiplyMM(mMVPMatrix,0,mProjectMatrix,0,mViewMatrix,0);
-
-    }
-
-    @Override
-    public void onDrawFrame(GL10 gl) {
-        //清空颜色，使用之前配置好的颜色
-        GLES20.glClear(GLES20.GL_COLOR_BUFFER_BIT|GLES20.GL_DEPTH_BUFFER_BIT);
-        //使用程序
-        GLES20.glUseProgram(mProgram);
-
-        //找到索引点
-        mVertexPos = GLES20.glGetAttribLocation(mProgram, "aPosition");
-        mTexturePos = GLES20.glGetAttribLocation(mProgram, "aCoordinate");
-        mTextureHandler = GLES20.glGetUniformLocation(mProgram, "uTexture");
-        glHMatrix=GLES20.glGetUniformLocation(mProgram,"vMatrix");
-
-        //启用索引
-        GLES20.glEnableVertexAttribArray(mVertexPos);
-        GLES20.glEnableVertexAttribArray(mTexturePos);
-
-        //设置着色器参数， 第二个参数表示一个顶点包含的数据数量，这里为xy，所以为2
-        GLES20.glVertexAttribPointer(mVertexPos, 2, GLES20.GL_FLOAT, false, 0, vertexBuffer);
-        GLES20.glVertexAttribPointer(mTexturePos, 2, GLES20.GL_FLOAT, false, 0, textureBuffer);
-        //传递矩阵变换
-        GLES20.glUniformMatrix4fv(glHMatrix,1,false,mMVPMatrix,0);
-
-
-        //激活指定纹理单元,系统默认激活的是0
-        GLES20.glActiveTexture(GLES20.GL_TEXTURE0);
-        //将激活的纹理单元传递到着色器里面，这里的0和GLES20.GL_TEXTURE0一一对应
-        GLES20.glUniform1i(mTextureHandler, 0);
-        //可以储存多个纹理，因为我们这里只使用一个纹理，所以数组长度是1
+        //创建纹理
         int[] texture = new int[1];
         GLES20.glGenTextures(1, texture, 0);
-        GLES20.glBindTexture(GLES20.GL_TEXTURE_2D, texture[0]);
+        textTureID = texture[0];
+        GLES20.glBindTexture(GLES20.GL_TEXTURE_2D, textTureID);
         //设置缩小过滤为使用纹理中坐标最接近的一个像素的颜色作为需要绘制的像素颜色
         GLES20.glTexParameterf(GLES20.GL_TEXTURE_2D, GLES20.GL_TEXTURE_MIN_FILTER, GLES20.GL_NEAREST);
         //设置放大过滤为使用纹理中坐标最接近的若干个颜色，通过加权平均算法得到需要绘制的像素颜色
@@ -160,6 +115,76 @@ public class ImageRender implements GLSurfaceView.Renderer {
         //设置环绕方向T，截取纹理坐标到[1/2n,1-1/2n]。将导致永远不会与border融合
         GLES20.glTexParameterf(GLES20.GL_TEXTURE_2D, GLES20.GL_TEXTURE_WRAP_T, GLES20.GL_CLAMP_TO_EDGE);
         GLUtils.texImage2D(GLES20.GL_TEXTURE_2D, 0, mBitmap, 0);
+        mBitmap.recycle();
+        //解绑纹理 指的是离开对 纹理的配置，进入下一个状态
+        GLES20.glBindTexture(GLES20.GL_TEXTURE_2D, 0);
+    }
+
+    @Override
+    public void onSurfaceChanged(GL10 gl, int width, int height) {
+        GLES20.glViewport(0, 0, width, height);
+        //处理图片变形问题,推导过程https://juejin.cn/post/6844903984235282445#heading-9
+        int w = mBitmap.getWidth();
+        int h = mBitmap.getHeight();
+        float sWH = w / (float) h;
+        float sWidthHeight = width / (float) height;
+        //视口宽度大于高度，横屏
+        if (width > height) {
+            if (sWH > sWidthHeight) {
+                Matrix.orthoM(mProjectMatrix, 0, -sWidthHeight * sWH, sWidthHeight * sWH, -1, 1, 3, 5);
+            } else {
+                Matrix.orthoM(mProjectMatrix, 0, -sWidthHeight / sWH, sWidthHeight / sWH, -1, 1, 3, 5);
+            }
+        } else {
+            if (sWH > sWidthHeight) {
+                Matrix.orthoM(mProjectMatrix, 0, -1, 1, -1 / sWidthHeight * sWH, 1 / sWidthHeight * sWH, 3, 5);
+            } else {
+                Matrix.orthoM(mProjectMatrix, 0, -1, 1, -sWH / sWidthHeight, sWH / sWidthHeight, 3, 5);
+            }
+        }
+        //设置相机位置
+        Matrix.setLookAtM(mViewMatrix, 0, 0, 0, 5.0f, 0f, 0f, 0f, 0f, 1.0f, 0.0f);
+        //计算变换矩阵
+        Matrix.multiplyMM(mMVPMatrix, 0, mProjectMatrix, 0, mViewMatrix, 0);
+
+    }
+
+    @Override
+    public void onDrawFrame(GL10 gl) {
+        //清空颜色，使用之前配置好的颜色
+        GLES20.glClear(GLES20.GL_COLOR_BUFFER_BIT | GLES20.GL_DEPTH_BUFFER_BIT);
+        //使用程序
+        GLES20.glUseProgram(mProgram);
+
+        //找到索引点
+        mVertexPos = GLES20.glGetAttribLocation(mProgram, "aPosition");
+        mTexturePos = GLES20.glGetAttribLocation(mProgram, "aCoordinate");
+        mTextureHandler = GLES20.glGetUniformLocation(mProgram, "uTexture");
+        glHMatrix = GLES20.glGetUniformLocation(mProgram, "vMatrix");
+
+
+        //传递矩阵变换
+        GLES20.glUniformMatrix4fv(glHMatrix, 1, false, mMVPMatrix, 0);
+        GLES20.glUniform1i(mTextureHandler, 0);
+
+        //开始使用 VBO
+        GLES20.glBindBuffer(GLES20.GL_ARRAY_BUFFER, vboID);
+        //启用索引
+        GLES20.glEnableVertexAttribArray(mVertexPos);
+        //设置着色器参数， 第二个参数表示一个顶点包含的数据数量，这里为xy，所以为2
+        GLES20.glVertexAttribPointer(mVertexPos, 2, GLES20.GL_FLOAT, false, 8, 0);
+        //启用索引
+        GLES20.glEnableVertexAttribArray(mTexturePos);
+        //设置着色器参数，
+        GLES20.glVertexAttribPointer(mTexturePos, 2, GLES20.GL_FLOAT, false, 8, vertexs.length * 4);
+        //退出 VBO的使用
+        GLES20.glBindBuffer(GLES20.GL_ARRAY_BUFFER, 0);
+
+
+        //激活指定纹理单元,系统默认激活的是0
+        GLES20.glActiveTexture(GLES20.GL_TEXTURE0);
+        //绑定 bitmapTexture 到纹理
+        GLES20.glBindTexture(GLES20.GL_TEXTURE_2D, textTureID);
         //绘制矩形
         GLES20.glDrawArrays(GLES20.GL_TRIANGLE_STRIP, 0, 4);
         //解绑 2D纹理，退出对纹理的使用
@@ -172,7 +197,7 @@ public class ImageRender implements GLSurfaceView.Renderer {
         return "attribute vec4 aPosition;" +
                 "attribute vec2 aCoordinate;" +
                 "varying vec2 vCoordinate;" +
-                "uniform mat4 vMatrix;"+
+                "uniform mat4 vMatrix;" +
                 "void main() {" +
                 "  gl_Position = vMatrix*aPosition;" +
                 "  vCoordinate = aCoordinate;" +
@@ -212,6 +237,4 @@ public class ImageRender implements GLSurfaceView.Renderer {
     public void setBitmap(Bitmap bitmap) {
         this.mBitmap = bitmap;
     }
-
-
 }
