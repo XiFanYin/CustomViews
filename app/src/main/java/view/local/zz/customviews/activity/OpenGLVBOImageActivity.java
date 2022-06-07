@@ -4,23 +4,20 @@ import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.opengl.GLSurfaceView;
 import android.os.Bundle;
-import android.widget.ImageView;
 
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 
-import java.nio.ByteBuffer;
-
 import view.local.zz.customviews.R;
-import view.local.zz.customviews.views.imagesurface.FBORenderTwo;
 import view.local.zz.customviews.views.imagesurface.ImageRender;
+import view.local.zz.customviews.views.imagesurface.VBOImageRender;
 
 
-public class OpenGLImageActivity extends AppCompatActivity {
+public class OpenGLVBOImageActivity extends AppCompatActivity {
 
     GLSurfaceView imageSurface;
     private Bitmap t;
-    private ImageRender reader;
+    private VBOImageRender reader;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -35,7 +32,7 @@ public class OpenGLImageActivity extends AppCompatActivity {
         //设置版本
         imageSurface.setEGLContextClientVersion(2);
         //创建渲染器
-        reader = new ImageRender();
+        reader = new VBOImageRender();
         //设置图片
         reader.setBitmap(t);
         //设置渲染器
