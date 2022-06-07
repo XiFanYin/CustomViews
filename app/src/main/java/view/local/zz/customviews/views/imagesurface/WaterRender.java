@@ -254,7 +254,7 @@ public class WaterRender implements GLSurfaceView.Renderer {
         GLUtils.texImage2D(GLES20.GL_TEXTURE_2D, 0, waterBitmap, 0);
 
         //绘制矩形
-        GLES20.glDrawArrays(GLES20.GL_TRIANGLE_STRIP, 0, 8);
+        GLES20.glDrawArrays(GLES20.GL_TRIANGLE_STRIP, 0, 4);
         //解绑 2D纹理，退出对纹理的使用
         GLES20.glBindTexture(GLES20.GL_TEXTURE_2D, 0);
 
