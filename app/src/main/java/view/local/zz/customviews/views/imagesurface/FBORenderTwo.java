@@ -14,6 +14,11 @@ import java.util.Arrays;
 import javax.microedition.khronos.egl.EGLConfig;
 import javax.microedition.khronos.opengles.GL10;
 
+
+/**
+ * 这里没有使用VBO，但是使用了FBO。FBO是为了离屏渲染，比如添加水印之类的东西去做的
+ *https://blog.csdn.net/york2017/article/details/111500883?spm=1001.2014.3001.5502
+ */
 public class FBORenderTwo implements GLSurfaceView.Renderer {
     //创建纹理坐标
     float[] texture = {
@@ -118,6 +123,7 @@ public class FBORenderTwo implements GLSurfaceView.Renderer {
 
     @Override
     public void onSurfaceChanged(GL10 gl, int width, int height) {
+        //注意：这里不设置大小是因为要吧图片大小设置为要渲染的大小，
     }
 
     @Override
@@ -126,7 +132,7 @@ public class FBORenderTwo implements GLSurfaceView.Renderer {
         GLES20.glClear(GLES20.GL_COLOR_BUFFER_BIT | GLES20.GL_DEPTH_BUFFER_BIT);
         if (mBitmap != null && !mBitmap.isRecycled()) {
             GLES20.glUseProgram(mProgram);
-
+            //传递矩阵
             GLES20.glUniformMatrix4fv(mHMatrix, 1, false, matrix, 0);
             //激活纹理单元
             GLES20.glActiveTexture(GLES20.GL_TEXTURE0);
@@ -134,7 +140,7 @@ public class FBORenderTwo implements GLSurfaceView.Renderer {
 
             //激活顶点索引
             GLES20.glEnableVertexAttribArray(mHPosition);
-            //传递数据
+            //传递数据｛参数讲解详见ImageRender类说明｝
             GLES20.glVertexAttribPointer(mHPosition, 2, GLES20.GL_FLOAT, false, 0, mVerBuffer);
             //激活纹理索引
             GLES20.glEnableVertexAttribArray(mHCoord);
@@ -152,13 +158,14 @@ public class FBORenderTwo implements GLSurfaceView.Renderer {
             GLES20.glTexParameterf(GLES20.GL_TEXTURE_2D, GLES20.GL_TEXTURE_WRAP_T, GLES20.GL_CLAMP_TO_EDGE);
             GLUtils.texImage2D(GLES20.GL_TEXTURE_2D, 0, GLES20.GL_RGBA, mBitmap, 0);
 
+            //创建图片缓存容器
             mBuffer = ByteBuffer.allocate(mBitmap.getWidth() * mBitmap.getHeight() * 4);
             //绑定缓存FBO
             GLES20.glBindFramebuffer(GLES20.GL_FRAMEBUFFER, fFrame[0]);
             //纹理和缓存绑定FBO
             GLES20.glFramebufferTexture2D(GLES20.GL_FRAMEBUFFER, GLES20.GL_COLOR_ATTACHMENT0,
                     GLES20.GL_TEXTURE_2D, fTexture[0], 0);
-            //这里设置图片的宽高,注意
+            //这里设置视口的宽高，所以这里就不用换算其他矩阵了，只需要反转一下即可
             GLES20.glViewport(0, 0, mBitmap.getWidth(), mBitmap.getHeight());
             //绘制巨型
             GLES20.glDrawArrays(GLES20.GL_TRIANGLE_STRIP, 0, 4);
@@ -168,12 +175,14 @@ public class FBORenderTwo implements GLSurfaceView.Renderer {
             //从GPU读取到CPU数据的唯一方式
             GLES20.glReadPixels(0, 0, mBitmap.getWidth(), mBitmap.getHeight(), GLES20.GL_RGBA,
                     GLES20.GL_UNSIGNED_BYTE, mBuffer);
+            //渲染好的数据回调
             if (mCallback != null) {
                 mCallback.onCall(mBitmap.getWidth(), mBitmap.getHeight(), mBuffer);
             }
-
+            //释放纹理和渲染对象
             GLES20.glDeleteTextures(1, fTexture, 0);
             GLES20.glDeleteFramebuffers(1, fFrame, 0);
+            //释放图片
             mBitmap.recycle();
         }
 

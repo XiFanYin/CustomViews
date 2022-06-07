@@ -14,7 +14,8 @@ import javax.microedition.khronos.egl.EGLConfig;
 import javax.microedition.khronos.opengles.GL10;
 
 /**
- * 提升效率，使用VBO
+ * 当前渲染器使用VBO（把顶点数据缓存到GPU开辟的一段内存中）进行提升效率，如果想要使用VBO参考：
+ * https://blog.csdn.net/york2017/article/details/111500865?spm=1001.2014.3001.5502
  */
 public class VBOImageRender implements GLSurfaceView.Renderer {
 
@@ -51,7 +52,10 @@ public class VBOImageRender implements GLSurfaceView.Renderer {
     private float[] mProjectMatrix = new float[16];
     private float[] mMVPMatrix = new float[16];
 
-    //    https://blog.csdn.net/jeffdeen/article/details/55001797
+    /**
+     *     https://blog.csdn.net/jeffdeen/article/details/55001797
+     *   注意，程序的生成代码必须在渲染线程中处理，否则渲染不出来
+     */
     @Override
     public void onSurfaceCreated(GL10 gl, EGLConfig config) {
         //设置背景图片颜色
@@ -171,7 +175,9 @@ public class VBOImageRender implements GLSurfaceView.Renderer {
         GLES20.glBindBuffer(GLES20.GL_ARRAY_BUFFER, vboID);
         //启用索引
         GLES20.glEnableVertexAttribArray(mVertexPos);
-        //设置着色器参数， 第二个参数表示一个顶点包含的数据数量，这里为xy，所以为2
+        /**
+         * 当使用VBO后，最后一个参数传递是偏移量，倒数第二个参数传递的无变化
+         */
         GLES20.glVertexAttribPointer(mVertexPos, 2, GLES20.GL_FLOAT, false, 8, 0);
         //启用索引
         GLES20.glEnableVertexAttribArray(mTexturePos);

@@ -14,8 +14,9 @@ import javax.microedition.khronos.egl.EGLConfig;
 import javax.microedition.khronos.opengles.GL10;
 
 /**
- * 当前渲染器未使用VBO（把顶点数据缓存到GPU开辟的一段内存中）进行提升效率，如果想要使用VBO参考：
- * https://blog.csdn.net/york2017/article/details/111500865?spm=1001.2014.3001.5502
+ * 注意： GLES20.glVertexAttribPointer 参数有重载方法，一个是传递的数据索引，一个传递的是vbo数据偏移量，具体是什么要根据是否使用VBO去传递
+ * 说明地址：https://blog.csdn.net/weixin_37459951/article/details/96433508
+ * 该渲染器未使用VBO
  */
 public class ImageRender implements GLSurfaceView.Renderer {
 
@@ -52,7 +53,10 @@ public class ImageRender implements GLSurfaceView.Renderer {
     private float[] mProjectMatrix=new float[16];
     private float[] mMVPMatrix=new float[16];
 
-    //    https://blog.csdn.net/jeffdeen/article/details/55001797
+    /**
+     *     https://blog.csdn.net/jeffdeen/article/details/55001797
+     *   注意，程序的生成代码必须在渲染线程中处理，否则渲染不出来
+     */
     @Override
     public void onSurfaceCreated(GL10 gl, EGLConfig config) {
         //设置背景图片颜色
@@ -136,7 +140,17 @@ public class ImageRender implements GLSurfaceView.Renderer {
         GLES20.glEnableVertexAttribArray(mVertexPos);
         GLES20.glEnableVertexAttribArray(mTexturePos);
 
-        //设置着色器参数， 第二个参数表示一个顶点包含的数据数量，这里为xy，所以为2
+        /**
+         * 这里未使用VBO的参数解析
+         * 参数一：就是获取到的索引
+         * 参数二：每个顶点包含的分量，由于我们上边的顶点数组都是用xy去描述，所以这里传递2
+         * 参数三:数据的类型，上边数组是用的float去描述，所以这里传递GLES20.GL_FLOAT
+         * 参数四：我们是否希望数据被标准化(Normalize)。如果我们设置为GL_TRUE，所有数据都会被映射到0（对于有符号型signed数据是-1）到1之间。我们把它设置为GL_FALSE。
+         * 参数五：步长：就是连续的顶点属性组之间的间隔。举例：x ,y，x ，y ；两个x之间相差2个身位，每个身位占4个字节，所以这里应该填写2*4=8
+         * 那为什么这里参数传递是0呢？设置为0是让OpenGL决定具体步长是多少（注意：只有当数值是紧密排列时才可用）
+         * 参数六：可以传递cup数据指针，如果使用VBO就传递VBO偏移量，这里没有使用VBO，所以才传递的数据指针
+         *
+         */
         GLES20.glVertexAttribPointer(mVertexPos, 2, GLES20.GL_FLOAT, false, 0, vertexBuffer);
         GLES20.glVertexAttribPointer(mTexturePos, 2, GLES20.GL_FLOAT, false, 0, textureBuffer);
         //传递矩阵变换
