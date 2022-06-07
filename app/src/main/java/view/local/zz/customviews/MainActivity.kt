@@ -34,7 +34,7 @@ class MainActivity : AppCompatActivity() {
 
         Image_FBO.setOnClickListener { startActivity(Intent(this, OpenGLFBOImageActivity::class.java))  }
 
-
+        Image_water.setOnClickListener { startActivity(Intent(this, OpenGlWaterImageActivity::class.java))  }
 
         camera_surfaceView.setOnClickListener { startActivity(Intent(this, OpenGLCameraActivity::class.java)) }
 

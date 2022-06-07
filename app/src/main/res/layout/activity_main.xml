@@ -73,6 +73,11 @@
             android:layout_height="wrap_content"
             android:text="opengl+FBO显示图片" />
 
+        <Button
+            android:id="@+id/Image_water"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="opengl图片添加水印" />
 
 
         <Button
