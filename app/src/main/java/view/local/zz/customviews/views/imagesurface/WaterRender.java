@@ -8,6 +8,7 @@ import android.opengl.GLES20;
 import android.opengl.GLSurfaceView;
 import android.opengl.GLUtils;
 import android.opengl.Matrix;
+import android.util.Log;
 
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
@@ -17,10 +18,7 @@ import javax.microedition.khronos.egl.EGLConfig;
 import javax.microedition.khronos.opengles.GL10;
 
 /**
- * 因为要加水印，所以这里需要使用FBO+VBO去渲染
- *
- *
- *
+ * 当前水印实现逻辑是通过非离屏渲染的方式去实现了多纹理绘制
  */
 
 public class WaterRender implements GLSurfaceView.Renderer {
@@ -44,15 +42,12 @@ public class WaterRender implements GLSurfaceView.Renderer {
             1.0f, -1.0f,
             -1.0f, 1.0f,
             1.0f, 1.0f,
-            //右下角纹理坐标
-            0f, -1f,
-            1f, -1f,
-            0f, -0.8f,
-            1f, -0.8f
+            // 水印预留位置
+            0f, 0f,
+            0f, 0f,
+            0f, 0f,
+            0f, 0f
     };
-
-
-
 
 
     private FloatBuffer vertexBuffer;
@@ -68,17 +63,27 @@ public class WaterRender implements GLSurfaceView.Renderer {
     private float[] mProjectMatrix = new float[16];
     private float[] mMVPMatrix = new float[16];
 
+
     private int vboID;
 
     public WaterRender(Bitmap mBitmap) {
+        //底图
         this.mBitmap = mBitmap;
-    }
+        //水印文字图片
+        waterBitmap = createTextImage("我是水印文字", 36, "#ff0000", "#00000000", mBitmap);
+        //这里我们计算出来水印图片宽高比
+        float r = 1.0f * waterBitmap.getWidth() / waterBitmap.getHeight();
+        //我们假定图片的高度是0.1，那么根据宽高比可以计算出来图片的坐标
+        float w = r * 0.3f;
+        vertexs[8] = 0.8f - w;
+        vertexs[9] = -1f;
+        vertexs[10] = 0.8f;
+        vertexs[11] = -1f;
+        vertexs[12] = 0.8f - w;
+        vertexs[13] = -0.7f;
+        vertexs[14] = 0.8f;
+        vertexs[15] = -0.7f;
 
-
-    @Override
-    public void onSurfaceCreated(GL10 gl, EGLConfig config) {
-        //设置背景图片颜色
-        GLES20.glClearColor(1.0f, 1.0f, 1.0f, 1.0f);
         //数据复制到本地内存
         ByteBuffer bb = ByteBuffer.allocateDirect(vertexs.length * 4);
         bb.order(ByteOrder.nativeOrder());
@@ -97,9 +102,13 @@ public class WaterRender implements GLSurfaceView.Renderer {
         textureBuffer.put(texture);
         //位置数据从起始位置开始读取
         textureBuffer.position(0);
+    }
 
 
-
+    @Override
+    public void onSurfaceCreated(GL10 gl, EGLConfig config) {
+        //设置背景图片颜色
+        GLES20.glClearColor(1.0f, 1.0f, 1.0f, 1.0f);
 
         int vertexShader = loadShader(GLES20.GL_VERTEX_SHADER, getVertexShader());
         //调用父类方法编译源码，传递类型为片段
@@ -113,9 +122,11 @@ public class WaterRender implements GLSurfaceView.Renderer {
         //连接到着色器程序
         GLES20.glLinkProgram(mProgram);
 
-        //创建水印文字图片
-        waterBitmap = createTextImage("我是水印文字", 36, "#ff0000", "#00000000", 0);
-
+        //找到索引点
+        mVertexPos = GLES20.glGetAttribLocation(mProgram, "aPosition");
+        mTexturePos = GLES20.glGetAttribLocation(mProgram, "aCoordinate");
+        mTextureHandler = GLES20.glGetUniformLocation(mProgram, "uTexture");
+        glHMatrix = GLES20.glGetUniformLocation(mProgram, "vMatrix");
 
 
         //创建 VBO
@@ -140,7 +151,6 @@ public class WaterRender implements GLSurfaceView.Renderer {
         //设置文字支持透明
         GLES20.glEnable(GLES20.GL_BLEND);
         GLES20.glBlendFunc(GLES20.GL_SRC_ALPHA, GLES20.GL_ONE_MINUS_SRC_ALPHA);
-        //处理图片变形问题,推导过程https://juejin.cn/post/6844903984235282445#heading-9
         int w = mBitmap.getWidth();
         int h = mBitmap.getHeight();
         float sWH = w / (float) h;
@@ -173,11 +183,6 @@ public class WaterRender implements GLSurfaceView.Renderer {
         //使用程序
         GLES20.glUseProgram(mProgram);
 
-        //找到索引点
-        mVertexPos = GLES20.glGetAttribLocation(mProgram, "aPosition");
-        mTexturePos = GLES20.glGetAttribLocation(mProgram, "aCoordinate");
-        mTextureHandler = GLES20.glGetUniformLocation(mProgram, "uTexture");
-        glHMatrix = GLES20.glGetUniformLocation(mProgram, "vMatrix");
 
         //开始使用 VBO
         GLES20.glBindBuffer(GLES20.GL_ARRAY_BUFFER, vboID);
@@ -218,6 +223,8 @@ public class WaterRender implements GLSurfaceView.Renderer {
         //解绑 2D纹理，退出对纹理的使用
         GLES20.glBindTexture(GLES20.GL_TEXTURE_2D, 0);
 
+
+        //=========================绘制水印===================================================
 
         //开始使用 VBO
         GLES20.glBindBuffer(GLES20.GL_ARRAY_BUFFER, vboID);
@@ -303,7 +310,7 @@ public class WaterRender implements GLSurfaceView.Renderer {
     }
 
 
-    public static Bitmap createTextImage(String text, int textSize, String textColor, String bgColor, int padding) {
+    public static Bitmap createTextImage(String text, int textSize, String textColor, String bgColor, Bitmap bgBitmap) {
 
         Paint paint = new Paint();
         paint.setColor(Color.parseColor(textColor));
@@ -313,13 +320,25 @@ public class WaterRender implements GLSurfaceView.Renderer {
 
         float width = paint.measureText(text, 0, text.length());
         float top = paint.getFontMetrics().top;
-        float bottom = paint.getFontMetrics().bottom;
+        float h =   (float) bgBitmap.getHeight();
+        float w = (float)   bgBitmap.getWidth();
+        float  r= h/w;
 
-        Bitmap bm = Bitmap.createBitmap((int) (width + padding * 2), (int) ((bottom - top) + padding * 2), Bitmap.Config.ARGB_8888);
+        Bitmap bm = Bitmap.createBitmap((int) width, (int) (width*r), Bitmap.Config.ARGB_8888);
         Canvas canvas = new Canvas(bm);
         canvas.drawColor(Color.parseColor(bgColor));
-        canvas.drawText(text, padding, -top + padding, paint);
+        canvas.drawText(text, 0, -top, paint);
         return bm;
 
+    }
+
+
+    public static float[] getOriginalMatrix() {
+        return new float[]{
+                1, 0, 0, 0,
+                0, 1, 0, 0,
+                0, 0, 1, 0,
+                0, 0, 0, 1
+        };
     }
 }

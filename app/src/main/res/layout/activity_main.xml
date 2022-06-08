@@ -77,7 +77,7 @@
             android:id="@+id/Image_water"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="opengl图片添加水印" />
+            android:text="opengl图片添加水印+非离屏幕渲染" />
 
 
         <Button
