@@ -16,10 +16,13 @@ import javax.microedition.khronos.opengles.GL10;
 
 
 /**
- * 这里没有使用VBO，但是使用了FBO。FBO是为了离屏渲染，比如添加水印之类的东西去做的
- *https://blog.csdn.net/york2017/article/details/111500883?spm=1001.2014.3001.5502
+ * 这里没有使用VBO，但是使用了FBO。FBO是为了离屏渲染，比如图片变色做的
+ * https://blog.csdn.net/york2017/article/details/111500883?spm=1001.2014.3001.5502
+ *
+ * 需要注意，当前是FBO只与Texture绑定
+ *
  */
-public class FBORenderTwo implements GLSurfaceView.Renderer {
+public class FBORender implements GLSurfaceView.Renderer {
     //创建纹理坐标
     float[] texture = {
             0f, 1f,
@@ -75,13 +78,13 @@ public class FBORenderTwo implements GLSurfaceView.Renderer {
 
     private int[] fFrame = new int[1];
 
-    private int[] fTexture = new int[1];
+    private int[] fTexture = new int[2];
 
     private ByteBuffer mBuffer;
 
     private Callback mCallback;
 
-    public FBORenderTwo() {
+    public FBORender() {
         //定点数据复制到本地内存
         ByteBuffer a = ByteBuffer.allocateDirect(32);
         a.order(ByteOrder.nativeOrder());
@@ -149,24 +152,35 @@ public class FBORenderTwo implements GLSurfaceView.Renderer {
 
             //生成缓存FBO
             GLES20.glGenFramebuffers(1, fFrame, 0);
-            //生成纹理
-            GLES20.glGenTextures(1, fTexture, 0);
-            GLES20.glBindTexture(GLES20.GL_TEXTURE_2D, fTexture[0]);
-            GLES20.glTexParameterf(GLES20.GL_TEXTURE_2D, GLES20.GL_TEXTURE_MIN_FILTER, GLES20.GL_NEAREST);
-            GLES20.glTexParameterf(GLES20.GL_TEXTURE_2D, GLES20.GL_TEXTURE_MAG_FILTER, GLES20.GL_LINEAR);
-            GLES20.glTexParameterf(GLES20.GL_TEXTURE_2D, GLES20.GL_TEXTURE_WRAP_S, GLES20.GL_CLAMP_TO_EDGE);
-            GLES20.glTexParameterf(GLES20.GL_TEXTURE_2D, GLES20.GL_TEXTURE_WRAP_T, GLES20.GL_CLAMP_TO_EDGE);
-            GLUtils.texImage2D(GLES20.GL_TEXTURE_2D, 0, GLES20.GL_RGBA, mBitmap, 0);
+            //生成两个纹理，一个是图片纹理，一个是图片纹理，一个是缓存纹理
+            GLES20.glGenTextures(2, fTexture, 0);
+            for (int i = 0; i < 2; i++) {
+                GLES20.glBindTexture(GLES20.GL_TEXTURE_2D, fTexture[i]);
+                if (i == 0) {
+                    GLUtils.texImage2D(GLES20.GL_TEXTURE_2D, 0, GLES20.GL_RGBA, mBitmap, 0);
+                } else {
+                    //生成一个接受渲染后的数据
+                    GLES20.glTexImage2D(GLES20.GL_TEXTURE_2D, 0, GLES20.GL_RGBA, mBitmap.getWidth(), mBitmap.getHeight(),
+                            0, GLES20.GL_RGBA, GLES20.GL_UNSIGNED_BYTE, null);
+                }
+                GLES20.glTexParameterf(GLES20.GL_TEXTURE_2D, GLES20.GL_TEXTURE_MIN_FILTER, GLES20.GL_NEAREST);
+                GLES20.glTexParameterf(GLES20.GL_TEXTURE_2D, GLES20.GL_TEXTURE_MAG_FILTER, GLES20.GL_LINEAR);
+                GLES20.glTexParameterf(GLES20.GL_TEXTURE_2D, GLES20.GL_TEXTURE_WRAP_S, GLES20.GL_CLAMP_TO_EDGE);
+                GLES20.glTexParameterf(GLES20.GL_TEXTURE_2D, GLES20.GL_TEXTURE_WRAP_T, GLES20.GL_CLAMP_TO_EDGE);
+            }
 
             //创建图片缓存容器
             mBuffer = ByteBuffer.allocate(mBitmap.getWidth() * mBitmap.getHeight() * 4);
             //绑定缓存FBO
             GLES20.glBindFramebuffer(GLES20.GL_FRAMEBUFFER, fFrame[0]);
-            //纹理和缓存绑定FBO
+            //为FrameBuffer挂载Texture[1]纹理来存储颜色
             GLES20.glFramebufferTexture2D(GLES20.GL_FRAMEBUFFER, GLES20.GL_COLOR_ATTACHMENT0,
-                    GLES20.GL_TEXTURE_2D, fTexture[0], 0);
+                    GLES20.GL_TEXTURE_2D, fTexture[1], 0);
             //这里设置视口的宽高，所以这里就不用换算其他矩阵了，只需要反转一下即可
             GLES20.glViewport(0, 0, mBitmap.getWidth(), mBitmap.getHeight());
+            //绑定纹理
+            GLES20.glBindTexture(GLES20.GL_TEXTURE_2D, fTexture[0]);
+
             //绘制巨型
             GLES20.glDrawArrays(GLES20.GL_TRIANGLE_STRIP, 0, 4);
             //释放索引
@@ -180,7 +194,7 @@ public class FBORenderTwo implements GLSurfaceView.Renderer {
                 mCallback.onCall(mBitmap.getWidth(), mBitmap.getHeight(), mBuffer);
             }
             //释放纹理和渲染对象
-            GLES20.glDeleteTextures(1, fTexture, 0);
+            GLES20.glDeleteTextures(2, fTexture, 0);
             GLES20.glDeleteFramebuffers(1, fFrame, 0);
             //释放图片
             mBitmap.recycle();

@@ -71,7 +71,7 @@
             android:id="@+id/Image_FBO"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="opengl+FBO显示图片" />
+            android:text="opengl+FBO（只与Texture绑定）显示图片" />
 
         <Button
             android:id="@+id/Image_water"

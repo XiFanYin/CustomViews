@@ -4,15 +4,11 @@ import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.opengl.GLSurfaceView;
 import android.os.Bundle;
-import android.widget.ImageView;
 
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 
-import java.nio.ByteBuffer;
-
 import view.local.zz.customviews.R;
-import view.local.zz.customviews.views.imagesurface.FBORenderTwo;
 import view.local.zz.customviews.views.imagesurface.ImageRender;
 
 

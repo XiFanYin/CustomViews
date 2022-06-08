@@ -12,7 +12,7 @@ import androidx.appcompat.app.AppCompatActivity;
 import java.nio.ByteBuffer;
 
 import view.local.zz.customviews.R;
-import view.local.zz.customviews.views.imagesurface.FBORenderTwo;
+import view.local.zz.customviews.views.imagesurface.FBORender;
 
 
 public class OpenGLFBOImageActivity extends AppCompatActivity {
@@ -20,7 +20,7 @@ public class OpenGLFBOImageActivity extends AppCompatActivity {
     GLSurfaceView imageSurface;
     ImageView image;
     private Bitmap t;
-    private FBORenderTwo reader;
+    private FBORender reader;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -36,11 +36,11 @@ public class OpenGLFBOImageActivity extends AppCompatActivity {
         //设置版本
         imageSurface.setEGLContextClientVersion(2);
         //创建渲染器
-        reader = new FBORenderTwo();
+        reader = new FBORender();
         //设置图片
         reader.setBitmap(t);
         //设置回调，离屏渲染之后
-        reader.setCallback(new FBORenderTwo.Callback() {
+        reader.setCallback(new FBORender.Callback() {
             @Override
             public void onCall(final int w, final int h, final ByteBuffer data) {
                 new Thread(new Runnable() {
