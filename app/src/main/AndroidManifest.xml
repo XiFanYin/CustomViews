@@ -25,12 +25,13 @@
         <activity android:name=".activity.CircleBezierProgressActivity" />
         <activity android:name=".activity.BitmapViewActivity" />
         <activity android:name=".activity.MyViewGroup1Activity" />
-        <activity android:name=".activity.OpenGLImageActivity"/>
-        <activity android:name=".activity.OpenGLVBOImageActivity"/>
+        <activity android:name=".activity.OpenGLImageActivity" />
+        <activity android:name=".activity.OpenGLVBOImageActivity" />
         <activity android:name=".activity.OpenGLFBOImageActivity" />
-        <activity android:name=".activity.OpenGlWaterImageActivity"/>
+        <activity android:name=".activity.OpenGlWaterImageActivity" />
+        <activity android:name=".activity.OpenGlWaterFBOImageActivity" />
         <activity android:name=".activity.OpenGLCameraActivity" />
-        <activity android:name=".activity.OpenGLVideoActivity"/>
+        <activity android:name=".activity.OpenGLVideoActivity" />
 
     </application>
 
