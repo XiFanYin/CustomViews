@@ -86,6 +86,13 @@
             android:layout_height="wrap_content"
             android:text="opengl图片添加水印+离屏幕渲染" />
 
+
+        <Button
+            android:id="@+id/egl"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="EGL渲染" />
+
         <Button
             android:id="@+id/camera_surfaceView"
             android:layout_width="match_parent"

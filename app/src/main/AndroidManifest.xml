@@ -30,6 +30,7 @@
         <activity android:name=".activity.OpenGLFBOImageActivity" />
         <activity android:name=".activity.OpenGlWaterImageActivity" />
         <activity android:name=".activity.OpenGlWaterFBOImageActivity" />
+        <activity android:name=".activity.OpenGlEGLActivity"/>
         <activity android:name=".activity.OpenGLCameraActivity" />
         <activity android:name=".activity.OpenGLVideoActivity" />
 

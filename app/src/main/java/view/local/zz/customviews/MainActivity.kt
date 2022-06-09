@@ -30,13 +30,15 @@ class MainActivity : AppCompatActivity() {
 
         image_surfaceView.setOnClickListener { startActivity(Intent(this, OpenGLImageActivity::class.java)) }
 
-        image_vbo.setOnClickListener { startActivity(Intent(this, OpenGLVBOImageActivity::class.java))   }
+        image_vbo.setOnClickListener { startActivity(Intent(this, OpenGLVBOImageActivity::class.java)) }
 
-        Image_FBO.setOnClickListener { startActivity(Intent(this, OpenGLFBOImageActivity::class.java))  }
+        Image_FBO.setOnClickListener { startActivity(Intent(this, OpenGLFBOImageActivity::class.java)) }
 
-        Image_water.setOnClickListener { startActivity(Intent(this, OpenGlWaterImageActivity::class.java))  }
+        Image_water.setOnClickListener { startActivity(Intent(this, OpenGlWaterImageActivity::class.java)) }
 
-        Image_water_fbo.setOnClickListener { startActivity(Intent(this, OpenGlWaterFBOImageActivity::class.java))  }
+        Image_water_fbo.setOnClickListener { startActivity(Intent(this, OpenGlWaterFBOImageActivity::class.java)) }
+
+        egl.setOnClickListener { startActivity(Intent(this, OpenGlEGLActivity::class.java)) }
 
 
         camera_surfaceView.setOnClickListener { startActivity(Intent(this, OpenGLCameraActivity::class.java)) }
