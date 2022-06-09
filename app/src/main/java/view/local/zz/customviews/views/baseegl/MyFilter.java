@@ -69,6 +69,7 @@ public class MyFilter extends BaseFilter {
             0, 0, 0, 1
     };
 
+    private int vboID;
 
     //构造方法
     public MyFilter() {
@@ -102,6 +103,20 @@ public class MyFilter extends BaseFilter {
         //删除shader
         GLES20.glDeleteShader(vertexShader);
         GLES20.glDeleteShader(fragmentShader);
+
+        //创建 VBO
+        int[] vbo = new int[1];
+        GLES20.glGenBuffers(1, vbo, 0);
+        vboID = vbo[0];
+        GLES20.glBindBuffer(GLES20.GL_ARRAY_BUFFER, vboID);
+        //分配 VBO需要的缓存大小
+        GLES20.glBufferData(GLES20.GL_ARRAY_BUFFER, vertexs.length * 4 + texture.length * 4, null, GLES20.GL_STATIC_DRAW);
+        //设置顶点坐标数据的值到 VBO
+        GLES20.glBufferSubData(GLES20.GL_ARRAY_BUFFER, 0, vertexs.length * 4, mVerBuffer);
+        //设置纹理坐标数据的值到 VBO
+        GLES20.glBufferSubData(GLES20.GL_ARRAY_BUFFER, vertexs.length * 4, texture.length * 4, mTexBuffer);
+        //解绑 VBO，指的是离开对 VBO的配置，进入下一个状态
+        GLES20.glBindBuffer(GLES20.GL_ARRAY_BUFFER, 0);
 
     }
 
@@ -139,16 +154,20 @@ public class MyFilter extends BaseFilter {
     }
 
     private void onDraw() {
-        //激活顶点索引
+        //开始使用 VBO
+        GLES20.glBindBuffer(GLES20.GL_ARRAY_BUFFER, vboID);
+        //启用索引
         GLES20.glEnableVertexAttribArray(mHPosition);
-        //传递数据
-        GLES20.glVertexAttribPointer(mHPosition, 2, GLES20.GL_FLOAT, false, 0, mVerBuffer);
-        //激活纹理索引
+        GLES20.glVertexAttribPointer(mHPosition, 2, GLES20.GL_FLOAT, false, 8, 0);
+        //启用索引
         GLES20.glEnableVertexAttribArray(mHCoord);
-        //传递数据
-        GLES20.glVertexAttribPointer(mHCoord, 2, GLES20.GL_FLOAT, false, 0, mTexBuffer);
+        //设置着色器参数，
+        GLES20.glVertexAttribPointer(mHCoord, 2, GLES20.GL_FLOAT, false, 8, vertexs.length * 4);
+        //退出 VBO的使用
+        GLES20.glBindBuffer(GLES20.GL_ARRAY_BUFFER, 0);
         //绘制巨型
         GLES20.glDrawArrays(GLES20.GL_TRIANGLE_STRIP, 0, 4);
+
     }
 
     private void onBindTexture() {
